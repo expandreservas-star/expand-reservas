@@ -111,7 +111,7 @@ h1{
 }
 
 #btnInstalar{
-  display:none;
+  display:block;
 }
 
 .aviso{
@@ -158,7 +158,7 @@ No Google Chrome ou Microsoft Edge, clique no botão abaixo para instalar o Expa
 </button>
 
 <p id="avisoComputador" class="aviso">
-Se o botão de instalação não aparecer, aguarde alguns segundos e atualize esta página.
+Clique no botão acima para instalar.
 </p>
 
 </div>
@@ -223,25 +223,29 @@ btnInstalar.addEventListener(
   "click",
   async function(){
 
-    if(!eventoInstalacao){
+    if(eventoInstalacao){
+
+      eventoInstalacao.prompt();
+
+      const escolha =
+        await eventoInstalacao.userChoice;
+
+      if(escolha.outcome === "accepted"){
+
+        btnInstalar.style.display = "none";
+
+        avisoComputador.textContent =
+          "Expand Reservas instalado com sucesso.";
+
+      }
+
+      eventoInstalacao = null;
+
       return;
     }
 
-    eventoInstalacao.prompt();
-
-    const escolha =
-      await eventoInstalacao.userChoice;
-
-    if(escolha.outcome === "accepted"){
-
-      btnInstalar.style.display = "none";
-
-      avisoComputador.textContent =
-        "Expand Reservas instalado com sucesso.";
-
-    }
-
-    eventoInstalacao = null;
+    avisoComputador.innerHTML =
+      "No Google Chrome, abra o menu <b>⋮</b> no canto superior direito e procure a opção <b>Instalar página como app</b> ou a opção de instalação disponível no navegador.";
 
   }
 );

@@ -1,65 +1,67 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-
 <meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
-
-<title>
-  Expand Reservas
-</title>
-
-<link
-  rel="manifest"
-  href="manifest.webmanifest"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Expand Reservas</title>
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-
-<meta
-  name="apple-mobile-web-app-title"
-  content="Expand Reservas"
->
-
-<meta
-  name="theme-color"
-  content="#062B59"
->
-
-<meta
-  http-equiv="refresh"
-  content="0;url=https://script.google.com/macros/s/AKfycbwvnGJSKKkqJEnMwSkgYA5wnCxR8IMfIn5ZNPTqqtZvnP3_dbg6LQCOMHOJnlCspiWk/exec"
->
-
+<meta name="apple-mobile-web-app-title" content="Expand Reservas">
+<meta name="theme-color" content="#062B59">
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;color:#16304d;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  main{background:white;border-radius:16px;box-shadow:0 8px 30px #062b591a;padding:30px 24px;max-width:420px;width:100%;text-align:center}
+  h1{color:#062B59;font-size:25px;margin:0 0 12px}
+  p{line-height:1.55}
+  .botao{display:block;padding:16px 20px;background:#062B59;color:white;border-radius:9px;text-decoration:none;font-weight:bold;margin:22px 0 14px}
+  .ajuda{font-size:13px;color:#596b7c}
+</style>
 <script>
-
-window.location.replace(
-  "https://script.google.com/macros/s/AKfycbwvnGJSKKkqJEnMwSkgYA5wnCxR8IMfIn5ZNPTqqtZvnP3_dbg6LQCOMHOJnlCspiWk/exec"
-);
-
+(function(){
+  'use strict';
+  const base = 'https://script.google.com/macros/s/AKfycbwvnGJSKKkqJEnMwSkgYA5wnCxR8IMfIn5ZNPTqqtZvnP3_dbg6LQCOMHOJnlCspiWk/exec';
+  const params = new URLSearchParams(window.location.search);
+  const pagina = (params.get('pagina') || '').trim().toLowerCase();
+  const token = params.get('token') || '';
+  // Somente o fluxo de criação de senha usa esta página intermediária.
+  if (pagina === 'criarsenha') {
+    document.addEventListener('DOMContentLoaded', function(){
+      const destino = new URL(base);
+      destino.searchParams.set('pagina', 'criarsenha');
+      destino.searchParams.set('token', token);
+      document.getElementById('abrir').href = destino.href;
+      document.getElementById('senha').hidden = false;
+      document.getElementById('normal').hidden = true;
+      if (!token) {
+        document.getElementById('abrir').hidden = true;
+        document.getElementById('orientacao').textContent = 'Este link está incompleto. Solicite um novo e-mail de criação de senha à administração.';
+      }
+    });
+  } else {
+    // Preserva o comportamento anterior do link amigável e do PWA.
+    window.location.replace(base);
+    document.addEventListener('DOMContentLoaded', function(){
+      document.getElementById('normal-link').href = base;
+    });
+  }
+})();
 </script>
-
 </head>
-
 <body>
-
-<p>
-  Abrindo o Expand Reservas...
-</p>
-
-<p>
-
-<a
-  href="https://script.google.com/macros/s/AKfycbwvnGJSKKkqJEnMwSkgYA5wnCxR8IMfIn5ZNPTqqtZvnP3_dbg6LQCOMHOJnlCspiWk/exec"
->
-  Toque aqui se o sistema não abrir automaticamente.
-</a>
-
-</p>
-
+<main>
+  <section id="senha" hidden>
+    <h1>Expand Reservas</h1>
+    <p id="orientacao">Seu cadastro foi aprovado. Toque no botão abaixo para criar sua senha de acesso.</p>
+    <a id="abrir" class="botao" href="#" rel="noreferrer">CRIAR MINHA SENHA</a>
+    <p class="ajuda">Este link é pessoal. Não o compartilhe com outras pessoas.</p>
+  </section>
+  <section id="normal">
+    <h1>Expand Reservas</h1>
+    <p>Abrindo o Expand Reservas...</p>
+    <p><a id="normal-link" href="https://script.google.com/macros/s/AKfycbwvnGJSKKkqJEnMwSkgYA5wnCxR8IMfIn5ZNPTqqtZvnP3_dbg6LQCOMHOJnlCspiWk/exec">Toque aqui se o sistema não abrir automaticamente.</a></p>
+  </section>
+</main>
 </body>
 </html>

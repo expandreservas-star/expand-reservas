@@ -15,8 +15,12 @@
   main{background:white;border-radius:16px;box-shadow:0 8px 30px #062b591a;padding:30px 24px;max-width:420px;width:100%;text-align:center}
   h1{color:#062B59;font-size:25px;margin:0 0 12px}
   p{line-height:1.55}
-  .botao{display:block;padding:16px 20px;background:#062B59;color:white;border-radius:9px;text-decoration:none;font-weight:bold;margin:22px 0 14px}
+  .botao{display:block;width:100%;padding:16px 20px;background:#062B59;color:white;border:0;border-radius:9px;text-decoration:none;font-weight:bold;margin:22px 0 14px;font-size:15px;cursor:pointer}
+  .botao-secundario{background:#fff;color:#062B59;border:1px solid #062B59;margin:12px 0}
   .ajuda{font-size:13px;color:#596b7c}
+  .instrucoes{background:#f4f7fb;border-radius:9px;padding:12px 14px;margin-top:12px;text-align:left;font-size:14px;line-height:1.55}
+  .instrucoes ol{margin:8px 0 0;padding-left:20px}
+  .mensagem{font-size:14px;line-height:1.5}
 </style>
 <script>
 (function(){
@@ -25,22 +29,47 @@
   const params = new URLSearchParams(window.location.search);
   const pagina = (params.get('pagina') || '').trim().toLowerCase();
   const token = params.get('token') || '';
-  // Somente o fluxo de criação de senha usa esta página intermediária.
+
   if (pagina === 'criarsenha') {
     document.addEventListener('DOMContentLoaded', function(){
       const destino = new URL(base);
       destino.searchParams.set('pagina', 'criarsenha');
       destino.searchParams.set('token', token);
-      document.getElementById('abrir').href = destino.href;
+      const link = destino.href;
+      const abrir = document.getElementById('abrir');
+      const copiar = document.getElementById('copiar');
+      const mensagem = document.getElementById('mensagem-copia');
+
+      abrir.href = link;
       document.getElementById('senha').hidden = false;
       document.getElementById('normal').hidden = true;
+
       if (!token) {
-        document.getElementById('abrir').hidden = true;
+        abrir.hidden = true;
+        copiar.hidden = true;
         document.getElementById('orientacao').textContent = 'Este link está incompleto. Solicite um novo e-mail de criação de senha à administração.';
+        return;
       }
+
+      copiar.addEventListener('click', async function(){
+        try {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard indisponível');
+          await navigator.clipboard.writeText(link);
+          mensagem.textContent = 'Link copiado! Abra o Safari, toque na barra de endereços, cole e acesse.';
+          document.getElementById('instrucoes').hidden = false;
+        } catch (erro) {
+          // Se o navegador impedir a cópia automática, oferece seleção manual.
+          document.getElementById('link-manual').value = link;
+          document.getElementById('copia-manual').hidden = false;
+          document.getElementById('instrucoes').hidden = false;
+          mensagem.textContent = 'Não foi possível copiar automaticamente. Toque no campo abaixo e selecione “Copiar”.';
+          document.getElementById('link-manual').focus();
+          document.getElementById('link-manual').select();
+        }
+      });
     });
   } else {
-    // Preserva o comportamento anterior do link amigável e do PWA.
+    // Mantém o redirecionamento original do link amigável e do PWA.
     window.location.replace(base);
     document.addEventListener('DOMContentLoaded', function(){
       document.getElementById('normal-link').href = base;
@@ -54,7 +83,22 @@
   <section id="senha" hidden>
     <h1>Expand Reservas</h1>
     <p id="orientacao">Seu cadastro foi aprovado. Toque no botão abaixo para criar sua senha de acesso.</p>
-    <a id="abrir" class="botao" href="#" rel="noreferrer">CRIAR MINHA SENHA</a>
+    <a id="abrir" class="botao" href="#" target="_blank" rel="noopener noreferrer">CRIAR MINHA SENHA</a>
+    <p class="ajuda">Se aparecer um erro ao abrir pelo Gmail, use a opção abaixo. Não é necessário mudar as configurações do aplicativo.</p>
+    <button id="copiar" type="button" class="botao botao-secundario">COPIAR LINK PARA ABRIR NO SAFARI</button>
+    <p id="mensagem-copia" class="mensagem" role="status" aria-live="polite"></p>
+    <div id="copia-manual" hidden>
+      <label for="link-manual" class="ajuda">Link de acesso:</label>
+      <input id="link-manual" type="text" readonly style="width:100%;padding:10px;margin-top:6px;border:1px solid #b9c5d1;border-radius:6px">
+    </div>
+    <div id="instrucoes" class="instrucoes" hidden>
+      <strong>Como abrir:</strong>
+      <ol>
+        <li>Abra o aplicativo Safari no iPhone.</li>
+        <li>Toque na barra de endereços.</li>
+        <li>Cole o link copiado e toque em Ir.</li>
+      </ol>
+    </div>
     <p class="ajuda">Este link é pessoal. Não o compartilhe com outras pessoas.</p>
   </section>
   <section id="normal">
